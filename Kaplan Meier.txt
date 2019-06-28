@@ -1,0 +1,37 @@
+#Kaplan Meier estimate of survival function(sorted & unique time pts)
+
+km<-function(time,status){
+  status<-status[order(time)]#Do this before ordering
+  time<-sort(time) #order time
+  n<-length(time)
+  d<-sum(status[time==time[1]])
+  u<-length(unique(time))
+  v<-unique(time)
+  prod<-rep(0,u)
+  prod[1]<-(n-d)/n
+  for(i in 2:u){
+    d<-sum(status[time==v[i]]) #obtain d at each unique sorted time point but don't store
+    n<-n-length(status[time==v[i-1]]) #obtain d at each unique sorted time point but don't store
+    prod[i]<-prod[i-1]*(n-d)/n #could be prod<=prod*(n-d)/n if I  did not have to store prod 
+  }
+  return(prod)
+}
+
+#Nelson Aaelen estimate of cumulative hazard 
+NEA<-function(time,status){
+  status<-status[order(time)]#Do this before ordering
+  time<-sort(time)#sort the time
+  n<-length(time)
+  d<-sum(status[time=time[1]])
+  u<-length(unique(time))
+  v<-unique(time)
+  nea<-rep(0,u)
+  nea[1]<-d/n
+  
+  for(i in 2:u){
+    n<-n-length(status[time==v[i-1]])
+    d<-sum(status[time==v[i]])
+    nea[i]<-nea[i-1]+d/n
+  }
+  return(nea)
+}
